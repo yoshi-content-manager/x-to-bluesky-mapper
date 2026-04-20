@@ -1,0 +1,26 @@
+name: Trigger public map refresh (template)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  call-refresh-endpoint:
+    runs-on: ubuntu-latest
+    env:
+      MAP_REFRESH_ENDPOINT_URL: ${{ vars.MAP_REFRESH_ENDPOINT_URL }}
+    steps:
+      - name: Validate endpoint URL variable
+        run: |
+          if [ -z "${MAP_REFRESH_ENDPOINT_URL:-}" ]; then
+            echo "::error::Missing repository variable MAP_REFRESH_ENDPOINT_URL"
+            exit 1
+          fi
+
+      - name: Trigger refresh
+        run: |
+          curl -fsS -X POST "${MAP_REFRESH_ENDPOINT_URL}"
